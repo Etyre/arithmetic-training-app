@@ -1,0 +1,108 @@
+.flashcard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 40px;
+}
+
+.flashcard {
+  background: white;
+  border-radius: 12px;
+  padding: 60px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.3s ease;
+  border: 8px solid transparent;
+  min-width: 400px;
+}
+
+.flashcard.incorrect {
+  border-color: #ef4444;
+  animation: flash 0.5s ease;
+}
+
+.flashcard.slow {
+  border-color: #eab308;
+  animation: flash 0.5s ease;
+}
+
+.flashcard.correct {
+  border-color: #22c55e;
+  animation: flash 0.5s ease;
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.problem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 48px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.operand {
+  min-width: 60px;
+  text-align: center;
+}
+
+.operation, .equals {
+  color: #6b7280;
+}
+
+.answer-input {
+  width: 100%;
+  font-size: 36px;
+  padding: 16px;
+  text-align: center;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.answer-input:focus {
+  border-color: #3b82f6;
+}
+
+/* Remove spinner arrows from number input */
+.answer-input::-webkit-inner-spin-button,
+.answer-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.answer-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.celebration {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.celebration h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.celebration p {
+  font-size: 24px;
+  color: #6b7280;
+  margin: 10px 0;
+}
+
+.celebration-message {
+  margin-top: 20px;
+  font-style: italic;
+}

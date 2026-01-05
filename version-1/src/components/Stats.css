@@ -1,0 +1,30 @@
+.stats-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stats-container h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.placeholder-message {
+  color: #6b7280;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.stats-preview {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-preview p {
+  font-size: 16px;
+  color: #1f2937;
+  margin: 10px 0;
+}
