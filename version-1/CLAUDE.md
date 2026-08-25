@@ -32,9 +32,9 @@ The card selection algorithm is designed to be swappable. The algorithm interfac
 
 ### Problem Space Definition
 
-- All operations limited to 0-12 range
-  - Addition: up to 12 + 12
-  - Multiplication: up to 12 × 12
+- All operations limited to 1-12 range (no zeros)
+  - Addition: 1+1 to 12+12
+  - Multiplication: 1×1 to 12×12
 - Subtraction: only problems with non-negative answers
 - Division: only problems with whole number answers (no remainders)
 
@@ -111,3 +111,38 @@ Stats toolbar (when in stats view):
 - Time series graph icon
 - Table view icon
 - Download CSV icon
+
+## Development
+
+### Running in Dev Mode
+
+To run the app in development mode with hot module replacement:
+
+```bash
+# Start the dev server (runs both Vite and TypeScript compiler)
+npm run dev
+
+# In a separate terminal, start Electron
+NODE_ENV=development npx electron .
+```
+
+The Vite dev server runs on port 5173 by default. Electron will connect to this port automatically.
+
+### Restarting the App
+
+When restarting during development, always restart both the dev server and Electron together:
+
+```bash
+# Kill everything and restart
+pkill -f "electron"; pkill -f "vite"; pkill -f "npm"
+npm run dev &
+sleep 2 && NODE_ENV=development npx electron .
+```
+
+**Important:** If only Electron is restarted without the dev server running, the app will show a blank screen due to connection refused error.
+
+### Building for Production
+
+```bash
+npm run build && npm start
+```

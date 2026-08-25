@@ -20,6 +20,7 @@ export interface CardState {
   streak: number;
   lastShown: number;
   graduated: boolean;
+  answeredCorrectly: boolean; // Has been answered correctly at least once (regardless of speed)
 }
 
 export interface PriorityCard {
@@ -31,6 +32,7 @@ export interface PriorityCard {
 export interface SessionState {
   cardStates: Map<string, CardState>;
   recentIncorrect: string[];
+  recentCards: string[]; // Last 2 cards shown, to prevent immediate repeats
   priorityCards: PriorityCard[];
   practiceSet: Operation[];
   graduationInterval: number;
@@ -42,3 +44,16 @@ export interface Settings {
 }
 
 export type FeedbackType = 'correct' | 'slow' | 'incorrect' | null;
+
+export interface Session {
+  id: number;
+  responses: Response[];
+  practiceSet: Operation[];
+  startTime: number;
+  endTime: number;
+  minResponseTime: number;
+  maxResponseTime: number;
+  avgResponseTime: number;
+}
+
+export type StatsView = 'timeSeries' | 'table' | 'sessionDetail';

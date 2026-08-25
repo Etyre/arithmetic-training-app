@@ -4,6 +4,7 @@ export interface CardSelector {
   selectNext(
     problems: Problem[],
     sessionState: SessionState,
-    responseHistory: Response[]
+    responseHistory: Response[],
+    currentProblemId?: string | null
   ): Problem | null;
 }

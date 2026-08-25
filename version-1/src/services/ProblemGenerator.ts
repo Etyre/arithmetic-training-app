@@ -18,8 +18,8 @@ export class ProblemGenerator {
 
   private generateAddition(): Problem[] {
     const problems: Problem[] = [];
-    for (let i = 0; i <= 12; i++) {
-      for (let j = 0; j <= 12; j++) {
+    for (let i = 1; i <= 12; i++) {
+      for (let j = 1; j <= 12; j++) {
         problems.push({
           id: `add-${i}-${j}`,
           operation: '+',
@@ -34,8 +34,8 @@ export class ProblemGenerator {
 
   private generateSubtraction(): Problem[] {
     const problems: Problem[] = [];
-    for (let i = 0; i <= 12; i++) {
-      for (let j = 0; j <= 12; j++) {
+    for (let i = 1; i <= 12; i++) {
+      for (let j = 1; j <= 12; j++) {
         if (i - j >= 0) {
           problems.push({
             id: `sub-${i}-${j}`,
@@ -52,8 +52,8 @@ export class ProblemGenerator {
 
   private generateMultiplication(): Problem[] {
     const problems: Problem[] = [];
-    for (let i = 0; i <= 12; i++) {
-      for (let j = 0; j <= 12; j++) {
+    for (let i = 1; i <= 12; i++) {
+      for (let j = 1; j <= 12; j++) {
         problems.push({
           id: `mul-${i}-${j}`,
           operation: '*',
@@ -68,7 +68,7 @@ export class ProblemGenerator {
 
   private generateDivision(): Problem[] {
     const problems: Problem[] = [];
-    for (let i = 0; i <= 12; i++) {
+    for (let i = 1; i <= 12; i++) {
       for (let j = 1; j <= 12; j++) {
         if (i % j === 0) {
           problems.push({

@@ -16,11 +16,11 @@ function createWindow() {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    const port = process.env.VITE_PORT || '5174';
+    const port = process.env.VITE_PORT || '5173';
     mainWindow.loadURL(`http://localhost:${port}`);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'renderer/index.html'));
   }
 
   mainWindow.on('closed', () => {
@@ -50,11 +50,27 @@ if (!fs.existsSync(dataPath)) {
 const responsesPath = path.join(dataPath, 'responses.json');
 const settingsPath = path.join(dataPath, 'settings.json');
 
+const ONE_MINUTE_MS = 60 * 1000;
+
+// Truncate response time to max 1 minute
+function truncateResponseTime(response: any): any {
+  const responseTime = response.responseTimestamp - response.queryTimestamp;
+  if (responseTime > ONE_MINUTE_MS) {
+    return {
+      ...response,
+      responseTimestamp: response.queryTimestamp + ONE_MINUTE_MS,
+    };
+  }
+  return response;
+}
+
 ipcMain.handle('load-responses', async () => {
   try {
     if (fs.existsSync(responsesPath)) {
       const data = fs.readFileSync(responsesPath, 'utf-8');
-      return JSON.parse(data);
+      const responses = JSON.parse(data);
+      // Truncate any response times > 1 minute
+      return responses.map(truncateResponseTime);
     }
     return [];
   } catch (error) {
@@ -70,7 +86,8 @@ ipcMain.handle('save-response', async (event, response) => {
       const data = fs.readFileSync(responsesPath, 'utf-8');
       responses = JSON.parse(data);
     }
-    responses.push(response);
+    // Truncate response time if > 1 minute before saving
+    responses.push(truncateResponseTime(response));
     fs.writeFileSync(responsesPath, JSON.stringify(responses, null, 2));
     return true;
   } catch (error) {

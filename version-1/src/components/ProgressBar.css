@@ -1,0 +1,33 @@
+.progress-bar-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 60px auto 30px auto;
+}
+
+.progress-bar {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.progress-section {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-section.graduated {
+  background: #22c55e;
+}
+
+.progress-section.in-progress {
+  background: #eab308;
+}
+
+.progress-label {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #6b7280;
+}
