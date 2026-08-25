@@ -73,6 +73,8 @@ export const Flashcard: React.FC<FlashcardProps> = ({
     }
   };
 
+  const isPercent = problem?.operation === '%';
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const answer = parseFloat(input);
@@ -214,17 +216,24 @@ export const Flashcard: React.FC<FlashcardProps> = ({
           <span className="equals">=</span>
         </div>
         <form onSubmit={handleSubmit}>
-          <input
-            ref={inputRef}
-            type="number"
-            step="any"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="answer-input"
-            placeholder="?"
-            autoFocus
-          />
+          <div
+            className={`answer-field ${isPercent ? 'has-suffix' : ''}`}
+            onClick={() => inputRef.current?.focus()}
+          >
+            <input
+              ref={inputRef}
+              type="number"
+              step="any"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="answer-input"
+              placeholder="?"
+              style={isPercent ? { width: `${Math.max(input.length, 1)}ch` } : undefined}
+              autoFocus
+            />
+            {isPercent && <span className="answer-suffix">%</span>}
+          </div>
         </form>
       </div>
     </div>

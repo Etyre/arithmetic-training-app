@@ -56,19 +56,44 @@
   color: #6b7280;
 }
 
-.answer-input {
+.answer-field {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  font-size: 36px;
   padding: 16px;
-  text-align: center;
   border: 2px solid #d1d5db;
   border-radius: 8px;
-  outline: none;
+  cursor: text;
   transition: border-color 0.2s;
 }
 
-.answer-input:focus {
+.answer-field:focus-within {
   border-color: #3b82f6;
+}
+
+.answer-input {
+  width: 100%;
+  font-size: 36px;
+  font-family: inherit;
+  padding: 0;
+  text-align: center;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+/* Percent mode: input shrinks to its content so the % suffix sits right after the number */
+.answer-field.has-suffix .answer-input {
+  min-width: 1ch;
+  text-align: right;
+}
+
+.answer-suffix {
+  font-size: 36px;
+  color: #6b7280;
+  margin-left: 2px;
+  user-select: none;
 }
 
 /* Remove spinner arrows from number input */
