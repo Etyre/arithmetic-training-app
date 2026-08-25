@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a desktop arithmetic flashcard training app for macOS. The app helps users practice basic arithmetic (addition, subtraction, multiplication, division) with spaced repetition and performance tracking.
+This is a desktop arithmetic flashcard training app for macOS. The app helps users practice basic arithmetic (addition, subtraction, multiplication, division, percent × percent) with spaced repetition and performance tracking.
 
 ## Architecture Overview
 
@@ -37,6 +37,9 @@ The card selection algorithm is designed to be swappable. The algorithm interfac
   - Multiplication: 1×1 to 12×12
 - Subtraction: only problems with non-negative answers
 - Division: only problems with whole number answers (no remainders)
+- Percent × Percent (`%`, id prefix `pct`): operands from 0%, 1%, 2%, 5%, 10%, … 100% (both orders); answer is entered in percent (e.g. `50% × 5% = 2.5`). Difficulty ranking uses the operand's index in `PERCENT_VALUES`.
+
+Shared helpers for ids, answers, labels, and display live in `src/utils/problems.ts`.
 
 ### Data Storage Requirements
 

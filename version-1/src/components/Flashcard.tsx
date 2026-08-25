@@ -10,6 +10,7 @@ import {
   Cell,
 } from 'recharts';
 import { Problem, FeedbackType, Response } from '../types';
+import { getCorrectAnswer, formatOperand, OPERATION_SYMBOL } from '../utils/problems';
 import './Flashcard.css';
 
 const ONE_MINUTE_MS = 60 * 1000;
@@ -27,18 +28,6 @@ function formatTime(ms: number): string {
   return (ms / 1000).toFixed(2) + 's';
 }
 
-function getCorrectAnswer(problemId: string): number {
-  const parts = problemId.split('-');
-  const op1 = parseInt(parts[1]);
-  const op2 = parseInt(parts[2]);
-  switch (parts[0]) {
-    case 'add': return op1 + op2;
-    case 'sub': return op1 - op2;
-    case 'mul': return op1 * op2;
-    case 'div': return op1 / op2;
-    default: return 0;
-  }
-}
 
 export const Flashcard: React.FC<FlashcardProps> = ({
   problem,
@@ -86,7 +75,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const answer = parseInt(input, 10);
+    const answer = parseFloat(input);
     if (!isNaN(answer)) {
       onSubmitAnswer(answer);
     }
@@ -95,14 +84,6 @@ export const Flashcard: React.FC<FlashcardProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
-    }
-  };
-
-  const getOperationSymbol = (op: string) => {
-    switch (op) {
-      case '*': return '×';
-      case '/': return '÷';
-      default: return op;
     }
   };
 
@@ -227,15 +208,16 @@ export const Flashcard: React.FC<FlashcardProps> = ({
     <div className="flashcard-container">
       <div className={`flashcard ${feedback || ''}`}>
         <div className="problem">
-          <span className="operand">{problem.operand1}</span>
-          <span className="operation">{getOperationSymbol(problem.operation)}</span>
-          <span className="operand">{problem.operand2}</span>
+          <span className="operand">{formatOperand(problem.operation, problem.operand1)}</span>
+          <span className="operation">{OPERATION_SYMBOL[problem.operation === '%' ? '*' : problem.operation]}</span>
+          <span className="operand">{formatOperand(problem.operation, problem.operand2)}</span>
           <span className="equals">=</span>
         </div>
         <form onSubmit={handleSubmit}>
           <input
             ref={inputRef}
             type="number"
+            step="any"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}

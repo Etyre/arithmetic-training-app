@@ -1,22 +1,31 @@
 import { CardSelector } from './CardSelector';
 import { Problem, SessionState, Response } from '../types';
+import { PERCENT_VALUES } from '../utils/problems';
 
 export class RandomSelector implements CardSelector {
   // Starting max operand (0-5 = 36 problems per operation)
   private static readonly INITIAL_MAX_OPERAND = 5;
-  // Final max operand
-  private static readonly FINAL_MAX_OPERAND = 12;
   // How many graduations before unlocking the next operand level
   private static readonly GRADUATIONS_PER_LEVEL = 10;
   // Graduated cards have 10x lower probability
   private static readonly GRADUATED_WEIGHT = 0.1;
 
   private getDifficulty(problem: Problem): number {
+    if (problem.operation === '%') {
+      // Percent problems: difficulty is the rank of the larger operand in the percent list
+      return Math.max(
+        PERCENT_VALUES.indexOf(problem.operand1),
+        PERCENT_VALUES.indexOf(problem.operand2)
+      );
+    }
     // Difficulty is the max operand value
     return Math.max(problem.operand1, problem.operand2);
   }
 
-  private getCurrentMaxOperand(sessionState: SessionState): number {
+  private getCurrentMaxOperand(sessionState: SessionState, problems: Problem[]): number {
+    // Cap at the hardest problem in the active set
+    const finalMax = problems.reduce((m, p) => Math.max(m, this.getDifficulty(p)), 0);
+
     // Count graduated cards
     let graduatedCount = 0;
     sessionState.cardStates.forEach(state => {
@@ -32,7 +41,7 @@ export class RandomSelector implements CardSelector {
 
     return Math.min(
       RandomSelector.INITIAL_MAX_OPERAND + additionalLevels,
-      RandomSelector.FINAL_MAX_OPERAND
+      finalMax
     );
   }
 
@@ -92,7 +101,7 @@ export class RandomSelector implements CardSelector {
     responseHistory: Response[],
     currentProblemId?: string | null
   ): Problem | null {
-    const currentMaxOperand = this.getCurrentMaxOperand(sessionState);
+    const currentMaxOperand = this.getCurrentMaxOperand(sessionState, problems);
 
     // Filter to problems within current difficulty level
     const availableByDifficulty = problems.filter(

@@ -16,6 +16,7 @@ import {
   Rectangle,
 } from 'recharts';
 import { Response, Operation, Session, StatsView } from '../types';
+import { getCorrectAnswer, getProblemDisplay, OPERATION_PREFIX, OPERATION_LABEL } from '../utils/problems';
 import './Stats.css';
 
 interface StatsProps {
@@ -27,6 +28,7 @@ const OPERATION_COLORS: Record<Operation, string> = {
   '-': '#3b82f6', // blue
   '*': '#f59e0b', // amber
   '/': '#8b5cf6', // purple
+  '%': '#ec4899', // pink
 };
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -102,12 +104,6 @@ function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString();
 }
 
-function getProblemDisplay(problemId: string): string {
-  const parts = problemId.split('-');
-  const opMap: Record<string, string> = { add: '+', sub: '-', mul: '×', div: '÷' };
-  return `${parts[1]} ${opMap[parts[0]]} ${parts[2]}`;
-}
-
 export const Stats: React.FC<StatsProps> = ({ responses }) => {
   const [statsView, setStatsView] = useState<StatsView>('timeSeries');
   const [excludeWrong, setExcludeWrong] = useState(false);
@@ -120,17 +116,7 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
     if (!excludeWrong) return sessions;
     return sessions.map(session => {
       const correctResponses = session.responses.filter(r => {
-        const problemParts = r.problemId.split('-');
-        const op1 = parseInt(problemParts[1]);
-        const op2 = parseInt(problemParts[2]);
-        let answer: number;
-        switch (problemParts[0]) {
-          case 'add': answer = op1 + op2; break;
-          case 'sub': answer = op1 - op2; break;
-          case 'mul': answer = op1 * op2; break;
-          case 'div': answer = op1 / op2; break;
-          default: answer = 0;
-        }
+        const answer = getCorrectAnswer(r.problemId);
         return r.givenAnswer === answer;
       });
       if (correctResponses.length === 0) return null;
@@ -193,17 +179,7 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
   const handleExportCSV = () => {
     const headers = ['Query Timestamp', 'Response Timestamp', 'Problem', 'Given Answer', 'Correct Answer', 'Correct', 'Response Time (ms)', 'Practice Set'];
     const rows = responses.map(r => {
-      const problemParts = r.problemId.split('-');
-      const op1 = parseInt(problemParts[1]);
-      const op2 = parseInt(problemParts[2]);
-      let correctAnswer: number;
-      switch (problemParts[0]) {
-        case 'add': correctAnswer = op1 + op2; break;
-        case 'sub': correctAnswer = op1 - op2; break;
-        case 'mul': correctAnswer = op1 * op2; break;
-        case 'div': correctAnswer = op1 / op2; break;
-        default: correctAnswer = 0;
-      }
+      const correctAnswer = getCorrectAnswer(r.problemId);
       const isCorrect = r.givenAnswer === correctAnswer;
       const responseTime = r.responseTimestamp - r.queryTimestamp;
       return [
@@ -229,23 +205,12 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
   };
 
   const tableData = useMemo(() => {
-    const opPrefix: Record<Operation, string> = { '+': 'add', '-': 'sub', '*': 'mul', '/': 'div' };
     const problems: Map<string, { total: number; correct: number; totalTime: number; mixedTotal: number; mixedCorrect: number; mixedTotalTime: number }> = new Map();
 
     responses.forEach(r => {
-      if (!r.problemId.startsWith(opPrefix[selectedOperation])) return;
+      if (!r.problemId.startsWith(OPERATION_PREFIX[selectedOperation] + '-')) return;
 
-      const problemParts = r.problemId.split('-');
-      const op1 = parseInt(problemParts[1]);
-      const op2 = parseInt(problemParts[2]);
-      let correctAnswer: number;
-      switch (problemParts[0]) {
-        case 'add': correctAnswer = op1 + op2; break;
-        case 'sub': correctAnswer = op1 - op2; break;
-        case 'mul': correctAnswer = op1 * op2; break;
-        case 'div': correctAnswer = op1 / op2; break;
-        default: correctAnswer = 0;
-      }
+      const correctAnswer = getCorrectAnswer(r.problemId);
       const isCorrect = r.givenAnswer === correctAnswer;
       const responseTime = r.responseTimestamp - r.queryTimestamp;
       const isMixed = r.practiceSet.length > 1;
@@ -284,17 +249,7 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
   const sessionDetailData = useMemo(() => {
     if (!selectedSession) return [];
     return selectedSession.responses.map((r, i) => {
-      const problemParts = r.problemId.split('-');
-      const op1 = parseInt(problemParts[1]);
-      const op2 = parseInt(problemParts[2]);
-      let correctAnswer: number;
-      switch (problemParts[0]) {
-        case 'add': correctAnswer = op1 + op2; break;
-        case 'sub': correctAnswer = op1 - op2; break;
-        case 'mul': correctAnswer = op1 * op2; break;
-        case 'div': correctAnswer = op1 / op2; break;
-        default: correctAnswer = 0;
-      }
+      const correctAnswer = getCorrectAnswer(r.problemId);
       const isCorrect = r.givenAnswer === correctAnswer;
       return {
         index: i + 1,
@@ -336,7 +291,7 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
       {Object.entries(OPERATION_COLORS).map(([op, color]) => (
         <div key={op} className="legend-item">
           <span className="legend-color" style={{ backgroundColor: color }}></span>
-          <span>{op === '+' ? 'Addition' : op === '-' ? 'Subtraction' : op === '*' ? 'Multiplication' : 'Division'}</span>
+          <span>{OPERATION_LABEL[op as Operation]}</span>
         </div>
       ))}
       <div className="legend-item">
@@ -556,6 +511,7 @@ export const Stats: React.FC<StatsProps> = ({ responses }) => {
           <option value="-">Subtraction (-)</option>
           <option value="*">Multiplication (×)</option>
           <option value="/">Division (÷)</option>
+          <option value="%">Percent × Percent (%)</option>
         </select>
       </div>
 

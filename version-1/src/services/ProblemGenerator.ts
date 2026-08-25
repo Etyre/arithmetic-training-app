@@ -1,4 +1,5 @@
 import { Problem, Operation } from '../types';
+import { PERCENT_VALUES, computeAnswer } from '../utils/problems';
 
 export class ProblemGenerator {
   private allProblems: Problem[] = [];
@@ -13,6 +14,7 @@ export class ProblemGenerator {
       ...this.generateSubtraction(),
       ...this.generateMultiplication(),
       ...this.generateDivision(),
+      ...this.generatePercentMultiplication(),
     ];
   }
 
@@ -79,6 +81,23 @@ export class ProblemGenerator {
             answer: i / j,
           });
         }
+      }
+    }
+    return problems;
+  }
+
+  // Percent × percent, answer expressed in percent (e.g. 50% × 5% = 2.5%)
+  private generatePercentMultiplication(): Problem[] {
+    const problems: Problem[] = [];
+    for (const i of PERCENT_VALUES) {
+      for (const j of PERCENT_VALUES) {
+        problems.push({
+          id: `pct-${i}-${j}`,
+          operation: '%',
+          operand1: i,
+          operand2: j,
+          answer: computeAnswer('%', i, j),
+        });
       }
     }
     return problems;

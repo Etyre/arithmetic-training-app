@@ -42,6 +42,7 @@ export const Settings: React.FC<SettingsProps> = ({ settings, onSettingsChange }
     { op: '-', label: 'Subtraction', symbol: '−' },
     { op: '*', label: 'Multiplication', symbol: '×' },
     { op: '/', label: 'Division', symbol: '÷' },
+    { op: '%', label: 'Percent × Percent', symbol: '%×%' },
   ];
 
   return (
