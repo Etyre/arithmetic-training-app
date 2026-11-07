@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Node / build output (version-1 has its own .gitignore too; this covers the root)
+node_modules/
+dist/
+*.log
+
+# Local Claude Code settings
+.claude/settings.local.json

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import {
   ScatterChart,
   Scatter,
@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { Problem, FeedbackType, Response } from '../types';
 import { getCorrectAnswer, formatOperand, OPERATION_SYMBOL } from '../utils/problems';
+import { loadDraft, saveDraft, clearDraft } from '../utils/drafts';
 import './Flashcard.css';
 
 const ONE_MINUTE_MS = 60 * 1000;
@@ -37,16 +38,22 @@ export const Flashcard: React.FC<FlashcardProps> = ({
   sessionResponses = [],
   onPauseResume,
 }) => {
-  const [input, setInput] = useState('');
+  // A half-typed answer is kept per card so it survives leaving the view or
+  // restarting the app; it is cleared only when the answer is submitted.
+  const draftKey = problem ? `practice:answer:${problem.id}` : null;
+  const [input, setInput] = useState(() => (draftKey ? loadDraft(draftKey) : ''));
   const [isPaused, setIsPaused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    setInput('');
+  // Layout effect so the restored draft is in place before the card is painted.
+  useLayoutEffect(() => {
+    setInput(draftKey ? loadDraft(draftKey) : '');
     setIsPaused(false);
     inputRef.current?.focus();
+  }, [problem, isComplete]);
 
+  useEffect(() => {
     // Clear any existing timer
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -79,6 +86,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({
     e.preventDefault();
     const answer = parseFloat(input);
     if (!isNaN(answer)) {
+      if (draftKey) clearDraft(draftKey);
       onSubmitAnswer(answer);
     }
   };
@@ -225,7 +233,10 @@ export const Flashcard: React.FC<FlashcardProps> = ({
               type="number"
               step="any"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                if (draftKey) saveDraft(draftKey, e.target.value);
+              }}
               onKeyDown={handleKeyDown}
               className="answer-input"
               placeholder="?"

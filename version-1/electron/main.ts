@@ -1,3 +1,20 @@
+// Arithmetic Trainer: Electron main process.
+//
+// A macOS desktop flashcard app for drilling arithmetic facts (+, -, x, /, and
+// percent x percent) with a graduation/streak system and response-time stats.
+// This file owns the window and the on-disk data; the UI lives in src/ (React,
+// bundled by Vite into dist/renderer) and talks to this process over IPC via
+// electron/preload.ts.
+//
+// Data:   ~/Library/Application Support/arithmetic-trainer/data/
+//           responses.json  every answer ever given (append-only)
+//           settings.json   practice set + graduation interval
+//         Override the folder with ARITHMETIC_TRAINER_DATA_DIR=<path> (used by
+//         the smoke test so it never touches real data).
+// Logs:   no log file; errors go to the Electron main-process console (the
+//         terminal that ran `npm start`). Dev mode also opens DevTools.
+// Drafts: the renderer keeps half-typed answers in localStorage (src/utils/drafts.ts).
+
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -42,7 +59,8 @@ app.on('activate', () => {
   }
 });
 
-const dataPath = path.join(app.getPath('userData'), 'data');
+const dataPath =
+  process.env.ARITHMETIC_TRAINER_DATA_DIR || path.join(app.getPath('userData'), 'data');
 if (!fs.existsSync(dataPath)) {
   fs.mkdirSync(dataPath, { recursive: true });
 }
